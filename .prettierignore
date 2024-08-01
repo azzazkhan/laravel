@@ -1,0 +1,7 @@
+node_modules
+vendor
+bootstrap
+lang
+public
+storage
+*.md
