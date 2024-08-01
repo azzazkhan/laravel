@@ -2,7 +2,7 @@ import './bootstrap';
 
 window.toast = function (message, options = {}) {
     let description = '';
-    let type = 'expanded';
+    let type = 'default';
     let position = 'bottom-right';
     let html = '';
     if (typeof options.description != 'undefined') description = options.description;
