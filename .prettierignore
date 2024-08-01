@@ -5,3 +5,5 @@ lang
 public
 storage
 *.md
+*.lock
+composer.*
