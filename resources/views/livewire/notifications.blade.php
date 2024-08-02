@@ -16,7 +16,9 @@ new class extends Component {
 
     #[On('echo:public,Pinged')]
     public function pinged($payload) {
-        $this->dispatch('pinged', user: $payload['user'], message: $payload['message'], type: 'info');
+        ['user' => $user, 'message' => $message] = $payload;
+
+        $this->dispatch('pinged', user: $user, message: $message, type: 'info');
     }
 }; ?>
 
@@ -24,7 +26,11 @@ new class extends Component {
     @script
         <script>
             $wire.on('pinged', ({user, message, type = 'default'}) => {
-                toast(`${user ? `User <strong>${user}</strong>` : 'System'} ${message ? 'messaged' : 'pinged'}`, {
+                let sender = `<strong>${user || 'System'}</strong>`;
+                let title = ` pinged`
+
+
+                toast(message ? `Message from ${sender}` : `${sender} pinged`, {
                     type,
                     description: message,
                 });
