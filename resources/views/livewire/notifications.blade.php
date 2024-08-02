@@ -15,21 +15,20 @@ new class extends Component {
     }
 
     #[On('echo:public,Pinged')]
-    public function pinged() {
-        $this->dispatch('pinged', 'Pinged', ['type' => 'info']);
-    }
-
-    #[On('echo-private:user.{user.id},Pinged')]
-    public function pingedPrivate() {
-        $this->dispatch('pinged', 'User pinged', ['type' => 'info']);
+    public function pinged($payload) {
+        $this->dispatch('pinged', user: $payload['user'], message: $payload['message'], type: 'info');
     }
 }; ?>
 
 <div>
     @script
         <script>
-            $wire.on('pinged', ([message, options]) => toast(message, options));
+            $wire.on('pinged', ({user, message, type = 'default'}) => {
+                toast(`${user ? `User <strong>${user}</strong>` : 'System'} ${message ? 'messaged' : 'pinged'}`, {
+                    type,
+                    description: message,
+                });
+            });
         </script>
     @endscript
 </div>
-

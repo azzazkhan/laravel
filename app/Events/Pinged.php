@@ -5,8 +5,6 @@ namespace App\Events;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -18,9 +16,21 @@ class Pinged implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(public ?User $user = null)
-    {
+    public function __construct(
+        public ?User $user = null,
+        public ?string $message = null
+    ) {
         //
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array<string, mixed>
+     */
+    public function broadcastWith(): array
+    {
+        return ['user' => $this->user?->name, 'message' => $this->message];
     }
 
     /**
@@ -30,6 +40,6 @@ class Pinged implements ShouldBroadcast
      */
     public function broadcastOn(): Channel
     {
-        return $this->user ? new PrivateChannel("user.{$this->user->id}") : new Channel('public');
+        return new Channel('public');
     }
 }
