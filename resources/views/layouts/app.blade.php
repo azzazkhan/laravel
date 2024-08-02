@@ -36,5 +36,7 @@
         <div class="relative w-auto h-auto">
             <x-toast />
         </div>
+
+        <livewire:notifications />
     </body>
 </html>
