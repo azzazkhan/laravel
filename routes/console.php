@@ -9,4 +9,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote')->hourly();
 
-Schedule::command(Ping::class)->everyTenSeconds();
+Schedule::command(Ping::class, ['--message' => 'Scheduled ping ' . now()->format('d-m-Y G:i:s (e)')])
+    ->everyThirtySeconds();
