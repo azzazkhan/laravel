@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Events\Pinged;
-use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+
+use function Laravel\Prompts\text;
 
 class Ping extends Command
 {
@@ -13,7 +15,7 @@ class Ping extends Command
      *
      * @var string
      */
-    protected $signature = 'ping';
+    protected $signature = 'ping {--message=}';
 
     /**
      * The console command description.
@@ -27,6 +29,14 @@ class Ping extends Command
      */
     public function handle()
     {
-        User::all(['id'])->each(fn (User $user) => Pinged::dispatch($user));
+        $interactive = !$this->option('no-interaction');
+        $message = $this->option('message');
+
+        $message ??= $interactive ? text(
+            label: 'What message should the users receive?',
+            placeholder: 'Optional',
+        ) : null;
+
+        broadcast(new Pinged(message: $message));
     }
 }
