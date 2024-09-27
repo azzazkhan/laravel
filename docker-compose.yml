@@ -1,0 +1,39 @@
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: laravel/app:latest
+        container_name: app
+        environment:
+            AUTORUN_ENABLED: true
+            APP_BASE_DIR: /var/www
+            HEALTHCHECK_PATH: /up
+            NGINX_WEBROOT: /var/www/public
+            PHP_MEMORY_LIMIT: 128M
+            PHP_OPCACHE_ENABLE: 1
+            PHP_UPLOAD_MAX_FILE_SIZE: 10M
+            PHP_POST_MAX_SIZE: 10M
+            NGINX_UPLOAD_LIMIT: 10M
+            NGINX_REQUEST_TIMEOUT: 30
+            SSL_MODE: off
+        volumes:
+            - ./.env:/var/www/.env:ro
+        networks:
+            - traefik
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.app.rule=Host(`localhost`)
+            - traefik.http.routers.app.entrypoints=web
+            - traefik.http.services.app-service.loadbalancer.server.port=8080
+        healthcheck:
+            test: curl -f http://localhost:8080 || exit 1
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+
+networks:
+    laravel:
+    traefik:
+        external: true

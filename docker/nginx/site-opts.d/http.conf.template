@@ -1,0 +1,36 @@
+server {
+
+    listen 8080 default_server;
+    listen [::]:8080 default_server;
+
+    server_name _; # Listen for all hosts
+    root $NGINX_WEBROOT;
+
+    # include snippets/security.conf;
+
+    index index.html index.htm index.php;
+
+    charset utf-8;
+
+    include snippets/healthcheck.conf;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    include snippets/performance.conf;
+    access_log off;
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass   127.0.0.1:9000;
+        fastcgi_index  index.php;
+        # fastcgi_param  SCRIPT_FILENAME $request_filename;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include        fastcgi_params;
+
+        fastcgi_buffers     $NGINX_FASTCGI_BUFFERS;
+        fastcgi_buffer_size $NGINX_FASTCGI_BUFFER_SIZE;
+    }
+}
