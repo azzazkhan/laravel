@@ -3,12 +3,11 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: laravel/app:latest
+        image: laravel/app
         container_name: app
         environment:
             AUTORUN_ENABLED: true
             APP_BASE_DIR: /var/www
-            HEALTHCHECK_PATH: /up
             NGINX_WEBROOT: /var/www/public
             PHP_MEMORY_LIMIT: 128M
             PHP_OPCACHE_ENABLE: 1
@@ -23,15 +22,23 @@ services:
             - traefik
         labels:
             - traefik.enable=true
-            - traefik.http.routers.app.rule=Host(`localhost`)
-            - traefik.http.routers.app.entrypoints=web
-            - traefik.http.services.app-service.loadbalancer.server.port=8080
-        healthcheck:
-            test: curl -f http://localhost:8080 || exit 1
-            interval: 10s
-            timeout: 5s
-            retries: 5
-            start_period: 10s
+            - traefik.http.routers.laravel.rule=Host(`localhost`)
+            - traefik.http.routers.laravel.entrypoints=web
+            - traefik.http.services.laravel-service.loadbalancer.server.port=8080
+
+    queue:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: laravel/app
+        scale: 4
+        environment:
+            AUTORUN_ENABLED: true
+            APP_BASE_DIR: /var/www
+            PHP_MEMORY_LIMIT: 128M
+            SHOW_WELCOME_MESSAGE: false
+        command: ['php', '/var/www/artisan', 'queue:work', 'redis', '--tries=3', '--backoff=5']
+        stop_signal: SIGTERM
 
 networks:
     laravel:

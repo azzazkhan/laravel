@@ -1,12 +1,11 @@
 server {
-
     listen 8080 default_server;
     listen [::]:8080 default_server;
 
     server_name _; # Listen for all hosts
     root $NGINX_WEBROOT;
 
-    # include snippets/security.conf;
+    include snippets/security.conf;
 
     index index.html index.htm index.php;
 
